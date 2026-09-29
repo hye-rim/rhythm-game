@@ -290,7 +290,7 @@
       const sc = scores[s.id] || 0;
       return `<button class="song" data-id="${s.id}">
         <span class="em" style="background:${s.color}">${s.emoji}</span>
-        <span class="mid"><div class="nm">${s.title}</div><div class="meta">${'★'.repeat(s.level)}${'☆'.repeat(3 - s.level)} ${s.levelName} · BPM ${s.bpm}</div></span>
+        <span class="mid"><div class="nm">${s.title}</div><div class="meta">${'★'.repeat(s.level)}${'☆'.repeat(4 - s.level)} ${s.levelName} · BPM ${s.bpm}${s.credit ? ' · ' + s.credit : ''}</div></span>
         <span class="best">${sc ? `${L.gradeOf(sc)}<b>${sc.toLocaleString()}</b>` : '<b>-</b>'}</span></button>`;
     }).join('');
   }
