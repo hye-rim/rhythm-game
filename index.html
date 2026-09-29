@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>리듬 탭</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+  :root { --ink:#2b1d52; --yellow:#ffd23f; --pink:#ff5fa2; --muted:#6b5c95; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body {
+    width:100%; height:100%; overflow:hidden; touch-action:none;
+    background:
+      repeating-linear-gradient(-30deg, rgba(255,255,255,.07) 0 26px, transparent 26px 56px),
+      linear-gradient(180deg, #4f8cff 0%, #6b5cff 55%, #8a4fe0 100%);
+    font-family:'Jua', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color:var(--ink);
+  }
+  #c { position:fixed; inset:0; width:100%; height:100dvh; display:block; touch-action:none; }
+  [hidden] { display:none !important; }
+  #pauseBtn {
+    position:fixed; top:calc(10px + env(safe-area-inset-top)); right:10px; width:38px; height:38px; z-index:5;
+    background:#fff; border:3px solid var(--ink); border-radius:12px; font-size:15px; cursor:pointer; box-shadow:0 4px 0 var(--ink); color:var(--ink);
+  }
+  #pauseBtn:active { transform:translateY(3px); box-shadow:0 1px 0 var(--ink); }
+  .screen {
+    position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:safe center; gap:12px;
+    padding:18px 16px; text-align:center; overflow-y:auto; touch-action:pan-y; height:100dvh;
+    background:rgba(43,29,82,.62); backdrop-filter:blur(3px);
+  }
+  .inked { color:#fff; font-weight:400; paint-order:stroke fill; -webkit-text-stroke:6px var(--ink); text-shadow:0 5px 0 var(--ink); }
+  h1 { font-size:clamp(42px, 12vw, 56px); line-height:1.05; color:var(--yellow); font-weight:400; paint-order:stroke fill; -webkit-text-stroke:6px var(--ink); text-shadow:0 5px 0 var(--ink); }
+  h1 .p { color:#ff9ecb; }
+  h2 { font-size:34px; font-weight:400; }
+  p.sub { font-size:14px; color:#fff; line-height:1.55; }
+  .songs { display:flex; flex-direction:column; gap:10px; width:min(100%, 380px); }
+  .song {
+    display:flex; align-items:center; gap:12px; text-align:left; width:100%; cursor:pointer; font-family:inherit; color:var(--ink);
+    background:#fff; border:3px solid var(--ink); border-radius:20px; box-shadow:0 6px 0 var(--ink); padding:10px 14px;
+  }
+  .song:active { transform:translateY(4px); box-shadow:0 2px 0 var(--ink); }
+  .song .em { flex:none; width:52px; height:52px; border-radius:16px; border:3px solid var(--ink); display:grid; place-items:center; font-size:28px; }
+  .song .mid { flex:1; min-width:0; }
+  .song .nm { font-size:21px; }
+  .song .meta { font-size:12px; color:var(--muted); margin-top:1px; }
+  .song .best { text-align:right; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .song .best b { display:block; font-size:24px; color:var(--pink); font-weight:400; line-height:1; }
+  .card {
+    font-size:14px; color:var(--ink); line-height:1.7; text-align:left; background:#fff; border:3px solid var(--ink);
+    border-radius:18px; box-shadow:0 5px 0 var(--ink); padding:10px 16px; width:min(100%, 380px);
+  }
+  .sync { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .sync .btns { display:flex; align-items:center; gap:8px; }
+  .sync button {
+    width:34px; height:34px; border-radius:11px; border:3px solid var(--ink); background:var(--yellow); font-family:inherit; font-size:18px;
+    color:var(--ink); box-shadow:0 3px 0 var(--ink); cursor:pointer;
+  }
+  .sync button:active { transform:translateY(2px); box-shadow:0 1px 0 var(--ink); }
+  .sync output { min-width:64px; text-align:center; font-variant-numeric:tabular-nums; }
+  .btn {
+    background:var(--yellow); color:var(--ink); font-size:22px; font-family:inherit; border:3px solid var(--ink);
+    border-radius:999px; padding:10px 34px; box-shadow:0 6px 0 var(--ink); cursor:pointer;
+  }
+  .btn.alt { background:#fff; font-size:18px; padding:8px 26px; }
+  .btn:active { transform:translateY(4px); box-shadow:0 2px 0 var(--ink); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .tag { display:inline-block; background:var(--pink); color:#fff; font-size:15px; padding:3px 14px; border-radius:999px; border:3px solid var(--ink); box-shadow:0 3px 0 var(--ink); }
+  .grade { font-size:96px; line-height:1; color:var(--yellow); }
+  .big { font-size:44px; color:var(--yellow); font-variant-numeric:tabular-nums; line-height:1; }
+  dl.stats { display:grid; grid-template-columns:auto auto; gap:3px 18px; text-align:left; font-size:16px; color:#fff; font-variant-numeric:tabular-nums; }
+  dl.stats dt { text-align:right; opacity:.85; }
+  @media (max-height:640px) { .screen { gap:8px; padding:10px; } h1 { font-size:36px; } .grade { font-size:64px; } .song .em { width:44px; height:44px; font-size:24px; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="pauseBtn" hidden aria-label="일시정지">❚❚</button>
+
+<div class="screen" id="menu">
+  <h1>리듬 <span class="p">탭</span></h1>
+  <p class="sub">떨어지는 음표가 선에 닿을 때 같은 줄을 톡!<br>PC는 <b style="color:#ffd23f;font-weight:400">D F J K</b> 키</p>
+  <div class="songs" id="songs"></div>
+  <div class="card sync">
+    <span>🎧 싱크 조절<br><small style="color:var(--muted)">반응이 어긋나 느껴지면 조절</small></span>
+    <span class="btns"><button id="syncMinus" aria-label="빠르게">−</button><output id="syncVal">0ms</output><button id="syncPlus" aria-label="늦게">＋</button></span>
+  </div>
+</div>
+
+<div class="screen" id="pause" hidden>
+  <h2 class="inked">일시정지</h2>
+  <button class="btn" id="resumeBtn">계속하기</button>
+  <div class="row"><button class="btn alt" id="retryBtn2">다시 시작</button><button class="btn alt" id="menuBtn2">곡 선택</button></div>
+</div>
+
+<div class="screen" id="result" hidden>
+  <div id="rTitle" class="tag"></div>
+  <div class="grade inked" id="rGrade">S</div>
+  <div class="big inked" id="rScore">0</div>
+  <div id="rNew" class="tag" hidden>🏆 최고 기록!</div>
+  <dl class="stats" id="rStats"></dl>
+  <div class="row"><button class="btn" id="retryBtn">다시 하기</button><button class="btn alt" id="menuBtn">곡 선택</button></div>
+</div>
+<script src="logic.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
