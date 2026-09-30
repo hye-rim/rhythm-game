@@ -108,6 +108,7 @@
     $('pause').hidden = s !== 'pause';
     $('result').hidden = s !== 'result';
     $('pauseBtn').hidden = s !== 'play';
+    if (s !== 'play') resize();          // 곡 중에 미뤄 둔 크기 변화를 반영
   }
 
   function pause() { if (state !== 'play') return; ctx.suspend(); setState('pause'); }
@@ -164,13 +165,18 @@
   }
 
   // ---------- 그리기 ----------
-  function resize() {
+  // 곡을 치는 중에 화면 높이만 조금 바뀌는 건(아이폰 사파리 주소창이 접히거나 펴질 때) 무시한다.
+  // 그때마다 판을 다시 맞추면 판정선과 버튼이 통째로 위아래로 출렁인다. 폭이 바뀌거나 곡 밖이면 다시 맞춘다
+  function resize(force) {
+    const w = window.innerWidth, h = window.innerHeight;
+    if (force !== true && state === 'play' && w === W && Math.abs(h - H) < 160) return;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
+    W = w; H = h;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => resize());
   const field = () => { const pw = Math.min(W, 520); return { pw, x0: (W - pw) / 2, lw: pw / 4, judgeY: Math.round(H * 0.8) }; };
 
   const GRADE_TEXT = { perfect: ['PERFECT', '#ffd23f'], great: ['GREAT', '#7ee081'], good: ['GOOD', '#4fc3f7'], miss: ['MISS', '#ff6b6b'] };
