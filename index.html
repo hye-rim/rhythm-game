@@ -72,6 +72,9 @@
   dl.stats { display:grid; grid-template-columns:auto auto; gap:3px 18px; text-align:left; font-size:16px; color:#fff; font-variant-numeric:tabular-nums; }
   dl.stats dt { text-align:right; opacity:.85; }
   @media (max-height:640px) { .screen { gap:8px; padding:10px; } h1 { font-size:36px; } .grade { font-size:64px; } .song .em { width:44px; height:44px; font-size:24px; } }
+  /* 기기에 맞는 설명만: 폰(손가락)은 .touch, PC(마우스·키보드)는 .pc */
+  .pc { display:none; }
+  @media (pointer:fine) { .pc { display:inline; } .touch { display:none; } }
 </style>
 </head>
 <body>
@@ -80,7 +83,7 @@
 
 <div class="screen" id="menu">
   <h1>리듬 <span class="p">탭</span></h1>
-  <p class="sub">떨어지는 음표가 선에 닿을 때 같은 줄을 톡!<br>PC는 <b style="color:#ffd23f;font-weight:400">D F J K</b> 키</p>
+  <p class="sub">떨어지는 음표가 선에 닿을 때 같은 줄을 톡!<span class="pc"><br>키보드는 <b style="color:#ffd23f;font-weight:400">D F J K</b> 키</span></p>
   <div class="songs" id="songs"></div>
   <div class="card sync">
     <span>🎧 싱크 조절<br><small style="color:var(--muted)">반응이 어긋나 느껴지면 조절</small></span>
