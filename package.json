@@ -1,0 +1,9 @@
+{
+  "name": "rhythm-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "리듬 탭 (정적 게임: 빌드 없이 index.html 을 열면 된다)",
+  "scripts": {
+    "test": "node --test"
+  }
+}
