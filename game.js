@@ -320,5 +320,7 @@
   $('menuBtn2').onclick = toMenu;
 
   resize(); renderSongs(); showOffset(); setState('menu'); loop();
+  /* @test-hooks:start */
   window.__rh = { press, update, draw, songNow, startSong, get counts() { return counts; }, get state() { return state; }, get notes() { return notes; }, get startAt() { return startAt; }, get ctx() { return ctx; }, finish };
+  /* @test-hooks:end */
 })();
