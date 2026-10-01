@@ -280,7 +280,11 @@
     e.preventDefault();
     if (state !== 'play') return;
     const { x0, lw } = field();
-    const lane = Math.floor((e.clientX - x0) / lw);
+    // 캔버스가 CSS로 확대·축소되거나 좌우에 여백이 생겨도 줄 판정이 어긋나지 않게
+    // 화면 좌표를 캔버스 내부 좌표로 먼저 변환한다.
+    const rect = cv.getBoundingClientRect();
+    const canvasX = (e.clientX - rect.left) * (W / rect.width);
+    const lane = Math.floor((canvasX - x0) / lw);
     if (lane >= 0 && lane < 4) press(lane);
   });
   window.addEventListener('keydown', (e) => {
