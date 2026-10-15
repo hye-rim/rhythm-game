@@ -61,13 +61,19 @@
     gn.gain.setValueAtTime(0.9, t); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
     o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 0.25);
   }
+  // 곡은 음표(멜로디)만 연주한다. 드럼·베이스·패드 같은 반주(배경음악)는 멜로디와 겹쳐 들려서 뺐다.
+  // 다시 넣고 싶으면 BACKING 을 true 로 (반주 데이터는 logic.js 가 그대로 만든다)
+  const BACKING = false;
   function scheduleSong(chart, song, at) {
-    chart.kick.forEach((t) => kick(at + t));
-    chart.snare.forEach((t) => { noise(at + t, 0.16, 0.45, 'bandpass', 1900); tone('triangle', 52, at + t, 0.1, 0.25); });
-    chart.hat.forEach((h) => noise(at + h.t, h.open ? 0.11 : 0.04, h.open ? 0.13 : 0.2, 'highpass', 7500));
-    chart.bass.forEach((b) => tone('sawtooth', b.midi, at + b.t, b.dur, 0.2, 520));
-    chart.pad.forEach((p) => tone('triangle', p.midi, at + p.t, p.dur, 0.035));
-    chart.lead.forEach((l) => tone(song.lead, l.midi, at + l.t, l.dur, song.lead === 'sawtooth' ? 0.09 : 0.14, song.lead === 'sawtooth' ? 2600 : 0));
+    if (BACKING) {
+      chart.kick.forEach((t) => kick(at + t));
+      chart.snare.forEach((t) => { noise(at + t, 0.16, 0.45, 'bandpass', 1900); tone('triangle', 52, at + t, 0.1, 0.25); });
+      chart.hat.forEach((h) => noise(at + h.t, h.open ? 0.11 : 0.04, h.open ? 0.13 : 0.2, 'highpass', 7500));
+      chart.bass.forEach((b) => tone('sawtooth', b.midi, at + b.t, b.dur, 0.2, 520));
+      chart.pad.forEach((p) => tone('triangle', p.midi, at + p.t, p.dur, 0.035));
+    }
+    // 반주가 없으니 멜로디를 조금 더 또렷하게
+    chart.lead.forEach((l) => tone(song.lead, l.midi, at + l.t, l.dur, song.lead === 'sawtooth' ? 0.13 : 0.2, song.lead === 'sawtooth' ? 2600 : 0));
   }
   function hitSound(grade) {
     if (!ctx) return;
