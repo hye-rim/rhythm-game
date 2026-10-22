@@ -1,4 +1,6 @@
 'use strict';
+// 오락실 튜토리얼이 '진짜로 일어난 일'을 알아채는 신호 (arcade/public/tutorial.js 가 듣는다. 튜토리얼이 아니면 아무도 안 듣는다)
+const tutorialSignal = (type) => window.dispatchEvent(new CustomEvent('arcade:tutorial', { detail: { type } }));
 
 (() => {
   const L = window.RhythmLogic;
@@ -122,6 +124,7 @@
   function toMenu() { if (ctx) { ctx.close(); ctx = null; } renderSongs(); setState('menu'); }
 
   function judgeNote(n, grade) {
+    if (grade !== 'miss') tutorialSignal('hit');                  // 박자에 맞게 쳤다
     n.done = true; judged++;
     counts[grade]++;
     if (grade === 'miss') combo = 0; else { combo++; maxCombo = Math.max(maxCombo, combo); }
